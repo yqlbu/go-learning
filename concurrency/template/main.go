@@ -6,7 +6,7 @@ func main() {
 	// business logics
 	rawInputs, _, err := //some api data (as a List)
 
-	wg := sync.WaitGroup{}
+	var wg sync.WaitGroup
 	itemList := []*model.Item{}
 
 	wg.Add(N) // initiate N number of goroutines
