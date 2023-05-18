@@ -2,44 +2,33 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"time"
 )
 
-func main() {
-	ctx := context.Background()
-	log.Println(ctx.Value("myKey"))
-	ctx2 := context.WithValue(ctx, "myKey", 123)
+func doSomethingCool(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("timed out")
+			return
+		default:
+			fmt.Println("doing something cool")
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
 
-	log.Println(ctx2)
-	log.Println(ctx2.Value("myKey"))
-
-	t := time.Now().Add(time.Second * 1)
-	ctx3, cancelFn := context.WithDeadline(ctx, t)
-	deadline, ok := ctx3.Deadline()
-	log.Println(deadline)
-	log.Println(ok)
-	cancelFn()
-	log.Println(ctx3.Err())
-	time.Sleep(time.Second * 2)
-	log.Println(ctx3.Err() == context.DeadlineExceeded)
-
-	// timeout := time.Second * 1
-	// ctx4, _ := context.WithTimeout(ctx, timeout)
-
-	// log.Println(ctx4.Err())
-	// time.Sleep(time.Second * 2)
-	// log.Println(ctx4.Err() == context.DeadlineExceeded)
-	fn(ctx3)
 }
 
-func fn(ctx context.Context) {
+func main() {
+	fmt.Println("Go Context Tutorial")
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	go doSomethingCool(ctx)
 	select {
-	case <-time.After(time.Second * 2):
-		log.Print("after 2 sec")
-	case <-time.After(time.Second * 1):
-		log.Print("after 1 sec")
 	case <-ctx.Done():
-		log.Println("boom context is done")
+		fmt.Println("oh no, I've exceeded the deadline")
 	}
+
+	time.Sleep(2 * time.Second)
 }
