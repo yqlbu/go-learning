@@ -54,6 +54,7 @@ func main() {
 		wg.Add(1)
 		_ = p.Invoke(int32(i))
 	}
+
 	wg.Wait()
 	log.Printf("running goroutines: %d\n", p.Running())
 	log.Printf("finish all tasks, result is %d\n", sum)
